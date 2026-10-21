@@ -1,6 +1,8 @@
-# Lab03
+# MCU_Lab_01
 
-โฟลเดอร์สำหรับเก็บงาน Lab03
+โฟลเดอร์สำหรับเก็บงาน MCU_Lab_01
+
+📺 ดูคลิปส่งงาน: https://thathinon.github.io/Microcontroller-and-Interfacing/
 
 ## เครื่องมือที่ใช้
 

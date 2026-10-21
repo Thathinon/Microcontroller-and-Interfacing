@@ -40,7 +40,7 @@ fetch(`https://api.github.com/repos/${REPO}/git/trees/main?recursive=1`)
   .then(data => {
     const files = (data.tree || []).filter(f => f.type === "blob" && VIDEO.test(f.path));
     const folders = new Set();
-    files.forEach(f => { const top = f.path.split("/")[0]; if (/^Lab\d+$/.test(top)) folders.add(top); });
+    files.forEach(f => { const top = f.path.split("/")[0]; if (/^MCU_Lab_\d+$/.test(top)) folders.add(top); });
     const root = document.getElementById("labs");
     root.innerHTML = folders.size ? "" : '<p class="empty">ยังไม่มีคลิป</p>';
     [...folders].sort().forEach(lab => {
