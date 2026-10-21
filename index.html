@@ -31,19 +31,18 @@
   <div id="labs"><p class="empty">กำลังโหลด…</p></div>
 </main>
 <script>
-// อ่านรายชื่อไฟล์วิดีโอจาก repo อัตโนมัติ: เพิ่มคลิปเข้า folder LabXX แล้วจะขึ้นหน้านี้เอง
+// อ่านรายชื่อไฟล์วิดีโอจาก repo อัตโนมัติ: แสดงเฉพาะ Lab ที่มีคลิปแล้ว
 const REPO = "Thathinon/Microcontroller-and-Interfacing";
-const LABS = ["Lab01", "Lab02", "Lab03", "Lab04", "Lab05"];
 const VIDEO = /\.(mp4|webm|mov|m4v)$/i;
 
 fetch(`https://api.github.com/repos/${REPO}/git/trees/main?recursive=1`)
   .then(r => r.json())
   .then(data => {
     const files = (data.tree || []).filter(f => f.type === "blob" && VIDEO.test(f.path));
-    const folders = new Set(LABS);
+    const folders = new Set();
     files.forEach(f => { const top = f.path.split("/")[0]; if (/^Lab\d+$/.test(top)) folders.add(top); });
     const root = document.getElementById("labs");
-    root.innerHTML = "";
+    root.innerHTML = folders.size ? "" : '<p class="empty">ยังไม่มีคลิป</p>';
     [...folders].sort().forEach(lab => {
       const sec = document.createElement("section");
       const h = document.createElement("h2");
@@ -51,12 +50,6 @@ fetch(`https://api.github.com/repos/${REPO}/git/trees/main?recursive=1`)
       sec.appendChild(h);
       const clips = files.filter(f => f.path.startsWith(lab + "/"))
         .sort((a, b) => a.path.localeCompare(b.path, undefined, { numeric: true }));
-      if (!clips.length) {
-        const p = document.createElement("p");
-        p.className = "empty";
-        p.textContent = "ยังไม่มีคลิป";
-        sec.appendChild(p);
-      }
       clips.forEach(f => {
         const div = document.createElement("div");
         div.className = "clip";
