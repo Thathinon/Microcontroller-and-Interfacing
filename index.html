@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Microcontroller and Interfacing</title>
+<style>
+  :root { --bg:#f7f7f8; --card:#fff; --text:#1d1d1f; --muted:#6b6b72; --line:#e3e3e8; --accent:#0a66c2; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#111214; --card:#1b1c1f; --text:#ececef; --muted:#9a9aa3; --line:#2c2d31; --accent:#5aa2ff; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family: system-ui, "Segoe UI", "Noto Sans Thai", sans-serif; line-height:1.6; }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 1.7rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 28px; }
+  section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; margin-bottom:20px; }
+  h2 { font-size:1.2rem; margin:0 0 14px; }
+  .clip { margin-bottom:18px; }
+  .clip:last-child { margin-bottom:0; }
+  .clip p { margin:0 0 6px; font-weight:600; }
+  video { width:100%; border-radius:8px; background:#000; display:block; }
+  .empty { color:var(--muted); margin:0; }
+  a { color:var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Microcontroller and Interfacing</h1>
+  <p class="sub">คลิปส่งงานแต่ละ Lab · <a href="https://github.com/Thathinon/Microcontroller-and-Interfacing">ดู repository</a></p>
+  <div id="labs"><p class="empty">กำลังโหลด…</p></div>
+</main>
+<script>
+// อ่านรายชื่อไฟล์วิดีโอจาก repo อัตโนมัติ: เพิ่มคลิปเข้า folder LabXX แล้วจะขึ้นหน้านี้เอง
+const REPO = "Thathinon/Microcontroller-and-Interfacing";
+const LABS = ["Lab01", "Lab02", "Lab03", "Lab04", "Lab05"];
+const VIDEO = /\.(mp4|webm|mov|m4v)$/i;
+
+fetch(`https://api.github.com/repos/${REPO}/git/trees/main?recursive=1`)
+  .then(r => r.json())
+  .then(data => {
+    const files = (data.tree || []).filter(f => f.type === "blob" && VIDEO.test(f.path));
+    const folders = new Set(LABS);
+    files.forEach(f => { const top = f.path.split("/")[0]; if (/^Lab\d+$/.test(top)) folders.add(top); });
+    const root = document.getElementById("labs");
+    root.innerHTML = "";
+    [...folders].sort().forEach(lab => {
+      const sec = document.createElement("section");
+      const h = document.createElement("h2");
+      h.textContent = lab;
+      sec.appendChild(h);
+      const clips = files.filter(f => f.path.startsWith(lab + "/"))
+        .sort((a, b) => a.path.localeCompare(b.path, undefined, { numeric: true }));
+      if (!clips.length) {
+        const p = document.createElement("p");
+        p.className = "empty";
+        p.textContent = "ยังไม่มีคลิป";
+        sec.appendChild(p);
+      }
+      clips.forEach(f => {
+        const div = document.createElement("div");
+        div.className = "clip";
+        const p = document.createElement("p");
+        p.textContent = f.path.split("/").pop().replace(VIDEO, "");
+        const v = document.createElement("video");
+        v.controls = true;
+        v.preload = "metadata";
+        v.src = f.path.split("/").map(encodeURIComponent).join("/");
+        div.append(p, v);
+        sec.appendChild(div);
+      });
+      root.appendChild(sec);
+    });
+  })
+  .catch(() => {
+    document.getElementById("labs").innerHTML = '<p class="empty">โหลดรายชื่อคลิปไม่สำเร็จ ลองรีเฟรชอีกครั้ง</p>';
+  });
+</script>
+</body>
+</html>
